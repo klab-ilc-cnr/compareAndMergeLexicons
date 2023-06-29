@@ -58,6 +58,7 @@ public class ConllComparator {
         ConllRow conllA = null; //Priority file to take info
         ConllRow conllB = null;
         ConllRow conllC = null;
+        ConllRow fakeConllRow = new ConllRow("1\tzzz\tzzz\tzzz\t_\t_\t_\t_\t_\t_"); //create a fake entry as last word ;
         FileWriter fileWriter = new FileWriter("/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/merge.csv");
         PrintWriter printWriter = new PrintWriter(fileWriter);
 
@@ -69,7 +70,7 @@ public class ConllComparator {
                 } else {
                     System.err.println("End of first file");
                     endA = true;
-                    conllA = new ConllRow("1\tzzz\tzzz\tzzz\t_\t_\t_\t_\t_\t_"); //create a fake entry as last word 
+                    conllA = fakeConllRow;
 
                 }
                 nextA = false;
@@ -82,7 +83,7 @@ public class ConllComparator {
                 } else {
                     System.err.println("End of second file");
                     endB = true;
-                    conllB = new ConllRow("2\tzzz\tzzz\tzzz\t_\t_\t_\t_\t_\t_"); //create a fake entry as last word 
+                    conllB = fakeConllRow;
 
                 }
                 nextB = false;
@@ -95,7 +96,7 @@ public class ConllComparator {
                 } else {
                     System.err.println("End of third file");
                     endC = true;
-                    conllC = new ConllRow("3\tzzz\tzzz\tzzz\t_\t_\t_\t_\t_\t_"); //create a fake entry as last word
+                    conllC = fakeConllRow;
 
                 }
                 nextC = false;
