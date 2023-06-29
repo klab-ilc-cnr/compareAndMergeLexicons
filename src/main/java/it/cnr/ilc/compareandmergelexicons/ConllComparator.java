@@ -69,10 +69,12 @@ public class ConllComparator {
                 } else {
                     System.err.println("End of first file");
                     endA = true;
+                    conllA = new ConllRow("1\tzzz\tzzz\tzzz\t_\t_\t_\t_\t_\t_"); //create a fake entry as last word 
+
                 }
                 nextA = false;
             }
-            
+
             if (nextB && !endB) {
                 String secondString = secondFile.readLine();
                 if (secondString != null) {
@@ -80,10 +82,12 @@ public class ConllComparator {
                 } else {
                     System.err.println("End of second file");
                     endB = true;
+                    conllB = new ConllRow("2\tzzz\tzzz\tzzz\t_\t_\t_\t_\t_\t_"); //create a fake entry as last word 
+
                 }
                 nextB = false;
             }
-            
+
             if (nextC && !endC) {
                 String thirdString = thirdFile.readLine();
                 if (thirdString != null) {
@@ -91,6 +95,8 @@ public class ConllComparator {
                 } else {
                     System.err.println("End of third file");
                     endC = true;
+                    conllC = new ConllRow("3\tzzz\tzzz\tzzz\t_\t_\t_\t_\t_\t_"); //create a fake entry as last word
+
                 }
                 nextC = false;
             }

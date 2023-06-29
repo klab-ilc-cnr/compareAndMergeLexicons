@@ -1,6 +1,8 @@
 package it.cnr.ilc.compareandmergelexicons;
 
+import java.text.Collator;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -93,19 +95,28 @@ class ConllRow {
      * are lexicographically greater than the string argument.
      */
     public int compareEntry(ConllRow entry) {
-        int equal = 0;
-        if (this.forma.equals(entry.getForma())) {
-            if (this.lemma.equals(entry.getLemma())) {
-                if (this.pos.equals(entry.getPos())) {
+        Collator itCollator = Collator.getInstance(Locale.ITALIAN);
+        itCollator.setStrength(Collator.SECONDARY);
+       
+        int equal;
+        int compareForma = itCollator.compare(getForma(), entry.getForma());
+        int compareLemma = itCollator.compare(getLemma(), entry.getLemma());
+        int comparePos   = itCollator.compare(getPos(),   entry.getPos());
+//        System.err.printf("forma: %s %s: %d\n",getForma(), entry.getForma(), compareForma);
+//        System.err.printf("lemma: %s %s: %d\n",getLemma(), entry.getLemma(), compareLemma);
+//        System.err.printf("pos: %s %s: %d\n",getPos(), entry.getPos(), comparePos);
+        if (compareForma == 0) {
+            if (compareLemma == 0){
+                if (comparePos == 0) {
                     equal = 0;
                 } else {
-                    equal = getPos().compareTo(entry.getPos());
+                    equal = comparePos;
                 }
             } else {
-                equal = getLemma().compareTo(entry.getLemma());
+                equal = compareLemma;
             }
         } else {
-            equal = getForma().compareTo(entry.getForma());
+            equal = compareForma;
         }
         return equal;
     }
@@ -120,25 +131,27 @@ class ConllRow {
      * from this entry -1 otherwise (not equal and not contained)
      */
     public int compareTraits(ConllRow entry) {
-        String firstTraits = Arrays.toString(this.getTraits());
-        String secondTraits = Arrays.toString(entry.getTraits());
-
+        int ret;
+        String firstTraits = String.join(",",this.getTraits());
+        String secondTraits = String.join(",",entry.getTraits());
         if (firstTraits.equals(secondTraits)) {
-            return 0;
+            ret =0;
         } else if (firstTraits.contains(secondTraits)) {
-            return 1;
+            ret =1;
         } else if (secondTraits.contains(firstTraits)) {
-            return 2;
+            ret = 2;
         } else {
-            return -1;
+            ret = -1;
         }
+        //System.err.printf("%s <=> %s : %d\n",firstTraits, secondTraits, ret);
+        return ret;
     }
 
     @Override
     public String toString() {
         String traits = Arrays.stream(getTraits()).collect(Collectors.joining("|"));
-        return String.format("%s\t%s\t%s\t%s\t_\t%s\t_\t_\t_\t%s\n", 
-                getId(), getForma(), getLemma(),getPos(), traits, getMisc());
+        return String.format("%s\t%s\t%s\t%s\t_\t%s\t_\t_\t_\t%s\n",
+                getId(), getForma(), getLemma(), getPos(), traits, getMisc());
     }
 
 }

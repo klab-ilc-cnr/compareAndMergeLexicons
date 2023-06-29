@@ -23,12 +23,15 @@ public class CompareAndMergeLexicons {
 //            System.exit(-1);
 //        }
 
-//        String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/out";
-//        String fileB = "/home/simone/Nextcloud/PROGETTI/magic_src/formario_MAGIC.conll";
-//        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/out";
-        String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/test.conll";
-        String fileB = "/home/simone/Nextcloud/PROGETTI/magic_src/test.conll";
-        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/test.conll";
+//        String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/zwing.conll";
+//        String fileB = "/home/simone/Nextcloud/PROGETTI/magic_src/zwing.conll";
+//        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/zzz.conll";
+        String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/out";
+        String fileB = "/home/simone/Nextcloud/PROGETTI/magic_src/formario_MAGIC.sort.conll";
+        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/out";
+//        String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/test.conll";
+//        String fileB = "/home/simone/Nextcloud/PROGETTI/magic_src/test.conll";
+//        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/test.conll";
 
         BufferedReader firstFile
                 = new BufferedReader(new FileReader(fileA));
