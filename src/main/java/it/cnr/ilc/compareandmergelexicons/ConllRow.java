@@ -18,6 +18,8 @@ class ConllRow {
     private String[] traits;
     private String misc;
 
+    private final Collator itCollator = Collator.getInstance(Locale.ITALIAN);
+
     public String getId() {
         return id;
     }
@@ -79,6 +81,8 @@ class ConllRow {
             setPos(cols[3]);
             setTraits(cols[5]);
             setMisc(cols[9]);
+            itCollator.setStrength(Collator.SECONDARY);
+
         } else {
             throw new MalformedConllRowException("Malformed Conll row " + conllRow);
         }
@@ -95,18 +99,16 @@ class ConllRow {
      * are lexicographically greater than the string argument.
      */
     public int compareEntry(ConllRow entry) {
-        Collator itCollator = Collator.getInstance(Locale.ITALIAN);
-        itCollator.setStrength(Collator.SECONDARY);
-       
+
         int equal;
         int compareForma = itCollator.compare(getForma(), entry.getForma());
         int compareLemma = itCollator.compare(getLemma(), entry.getLemma());
-        int comparePos   = itCollator.compare(getPos(),   entry.getPos());
+        int comparePos = itCollator.compare(getPos(), entry.getPos());
 //        System.err.printf("forma: %s %s: %d\n",getForma(), entry.getForma(), compareForma);
 //        System.err.printf("lemma: %s %s: %d\n",getLemma(), entry.getLemma(), compareLemma);
 //        System.err.printf("pos: %s %s: %d\n",getPos(), entry.getPos(), comparePos);
         if (compareForma == 0) {
-            if (compareLemma == 0){
+            if (compareLemma == 0) {
                 if (comparePos == 0) {
                     equal = 0;
                 } else {
@@ -132,12 +134,12 @@ class ConllRow {
      */
     public int compareTraits(ConllRow entry) {
         int ret;
-        String firstTraits = String.join(",",this.getTraits());
-        String secondTraits = String.join(",",entry.getTraits());
+        String firstTraits = String.join(",", this.getTraits());
+        String secondTraits = String.join(",", entry.getTraits());
         if (firstTraits.equals(secondTraits)) {
-            ret =0;
+            ret = 0;
         } else if (firstTraits.contains(secondTraits)) {
-            ret =1;
+            ret = 1;
         } else if (secondTraits.contains(firstTraits)) {
             ret = 2;
         } else {
