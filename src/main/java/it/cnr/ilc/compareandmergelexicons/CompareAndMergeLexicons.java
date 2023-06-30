@@ -24,9 +24,9 @@ public class CompareAndMergeLexicons {
 //        String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/zwing.conll";
 //        String fileB = "/home/simone/Nextcloud/PROGETTI/magic_src/zwing.conll";
 //        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/zzz.conll";
-        String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/out";
+        String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/lexico_lexinfo.conll";
         String fileB = "/home/simone/Nextcloud/PROGETTI/magic_src/formario_MAGIC.conll";
-        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/out";
+        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/UD_lexinfo.conll";
 //        String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/test.conll";
 //        String fileB = "/home/simone/Nextcloud/PROGETTI/magic_src/test.conll";
 //        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/test.conll";
