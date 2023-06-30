@@ -6,8 +6,6 @@ package it.cnr.ilc.compareandmergelexicons;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
