@@ -20,7 +20,6 @@ public class CompareAndMergeLexicons {
 //            System.err.println("No arguments!");
 //            System.exit(-1);
 //        }
-
 //        String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/zwing.conll";
 //        String fileB = "/home/simone/Nextcloud/PROGETTI/magic_src/zwing.conll";
 //        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/zzz.conll";
@@ -31,11 +30,15 @@ public class CompareAndMergeLexicons {
 //        String fileB = "/home/simone/Nextcloud/PROGETTI/magic_src/test.conll";
 //        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/test.conll";
 
+        String partialMergeFile = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/partialMerge.conll";
+        String finaleMergeFile = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/merge.conll";
+
         BufferedReader firstFile
                 = new BufferedReader(new FileReader(fileA));
-        
+
         BufferedReader secondFile
                 = new BufferedReader(new FileReader(fileB));
+
 
         BufferedReader thirdFile
                 = new BufferedReader(new FileReader(fileC));
@@ -43,9 +46,16 @@ public class CompareAndMergeLexicons {
         ConllComparator cc = new ConllComparator();
         cc.setFirstFile(firstFile);
         cc.setSecondFile(secondFile);
-        cc.setThirdFile(thirdFile);
-        
-        cc.compareLineByLine();
+
+        cc.compareLineByLine(partialMergeFile);
+
+        BufferedReader partialMergeBR
+                = new BufferedReader(new FileReader(partialMergeFile));
+
+        cc.setFirstFile(partialMergeBR);
+        cc.setSecondFile(thirdFile);
+
+        cc.compareLineByLine(finaleMergeFile);
 
     }
 }
