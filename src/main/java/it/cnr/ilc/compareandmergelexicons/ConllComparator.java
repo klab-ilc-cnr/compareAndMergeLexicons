@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.Collator;
+import java.text.RuleBasedCollator;
 
 /**
  *
@@ -49,7 +51,19 @@ public class ConllComparator {
         ConllRow conllA = null; //Priority file to take info
         ConllRow conllB = null;
 
-        ConllRow fakeConllRow = new ConllRow(Constants.FAKEROWSTRING); //create a fake entry as last word ;
+        String customRules = 
+                ( "< '%' < ''' < '\"'  < '(' < ')' < '-' < '.' < 0 < 1 < 2 < 3 < 4 < 5 "
+                + "< a,A < b,B < c,C < d,D < e,E < f,F < g,G < h,H < i,I < j,J < k,K < l,L "
+                + "< m,M < n,N < o,O < p,P < q,Q < r,R < s,S < t,T < u,U < v,V < w,W < x,X < y,Y < z,Z "
+                + "< ° < µ < à,À < è,È < é,É < ì < ò < ù");
+
+//        String customRules = (" < v < ù");
+                
+        RuleBasedCollator collator = new RuleBasedCollator(customRules);
+        collator.setStrength(Collator.SECONDARY);
+        
+        //System.err.println(collator.compare("\"", "z"));
+        ConllRow fakeConllRow = new ConllRow(Constants.FAKEROWSTRING, collator); //create a fake entry as last word ;
         FileWriter fileWriter = new FileWriter(outputfilename);
         PrintWriter printWriter = new PrintWriter(fileWriter);
 
@@ -57,7 +71,7 @@ public class ConllComparator {
             if (nextA && !endA) {
                 String firstString = firstFile.readLine();
                 if (firstString != null) {
-                    conllA = new ConllRow(firstString);
+                    conllA = new ConllRow(firstString, collator);
                 } else {
                     System.err.println("End of first file");
                     endA = true;
@@ -70,7 +84,7 @@ public class ConllComparator {
             if (nextB && !endB) {
                 String secondString = secondFile.readLine();
                 if (secondString != null) {
-                    conllB = new ConllRow(secondString);
+                    conllB = new ConllRow(secondString, collator);
                 } else {
                     System.err.println("End of second file");
                     endB = true;
