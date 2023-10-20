@@ -20,15 +20,17 @@ public class CompareAndMergeLexicons {
 //            System.err.println("No arguments!");
 //            System.exit(-1);
 //        }
-//        String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/zwing.conll";
-//        String fileB = "/home/simone/Nextcloud/PROGETTI/magic_src/zwing.conll";
-//        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/zzz.conll";
         String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/lexico_lexinfo.conll";
         String fileB = "/home/simone/Nextcloud/PROGETTI/magic_src/formario_MAGIC.conll";
         String fileC = "/home/simone/Nextcloud/PROGETTI/UD/UD_lexinfo.conll";
+
 //        String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/Lexico/test.conll";
 //        String fileB = "/home/simone/Nextcloud/PROGETTI/magic_src/test.conll";
 //        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/test.conll";
+ 
+//        String fileA = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/test1.conll";
+//        String fileB = "/home/simone/Nextcloud/PROGETTI/UD/UD_lexinfo.conll";
+//        String fileC = "/home/simone/Nextcloud/PROGETTI/UD/UD_lexinfo.conll";
 
         String partialMergeFile = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/partialMerge.conll";
         String finaleMergeFile = "/home/simone/Nextcloud/PROGETTI/FormarioItalex/merge.conll";
@@ -38,7 +40,6 @@ public class CompareAndMergeLexicons {
 
         BufferedReader secondFile
                 = new BufferedReader(new FileReader(fileB));
-
 
         BufferedReader thirdFile
                 = new BufferedReader(new FileReader(fileC));
@@ -56,6 +57,7 @@ public class CompareAndMergeLexicons {
         cc.setSecondFile(thirdFile);
 
         cc.compareLineByLine(finaleMergeFile);
+        System.err.println("End.");
 
     }
 }
