@@ -1,10 +1,10 @@
 package it.cnr.ilc.compareandmergelexicons;
 
 import java.text.Collator;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 
 /**
  *
@@ -18,8 +18,7 @@ class ConllRow {
     private String pos;
     private HashMap<String, String> traits;
     private String misc;
-
-    private final Collator itCollator = Collator.getInstance(Locale.ITALIAN);
+    private Collator myCollator;
 
     public String getId() {
         return id;
@@ -55,6 +54,14 @@ class ConllRow {
 
     public HashMap<String, String> getTraits() {
         return traits;
+    }
+
+    public Collator getMyCollator() {
+        return myCollator;
+    }
+
+    private void setMyCollator(Collator myCollator) {
+        this.myCollator = myCollator;
     }
 
     public String getTraitsAsString() {
@@ -93,7 +100,7 @@ class ConllRow {
         this.misc = misc;
     }
 
-    public ConllRow(String conllRow) throws MalformedConllRowException {
+    public ConllRow(String conllRow, Collator collator) throws MalformedConllRowException, ParseException {
 
         String[] cols = conllRow.split("\t");
 
@@ -104,10 +111,10 @@ class ConllRow {
             setPos(cols[3]);
             setTraits(cols[5]);
             setMisc(cols[9]);
-            itCollator.setStrength(Collator.SECONDARY);
+            setMyCollator(collator);
 
         } else {
-            throw new MalformedConllRowException("Malformed Conll row " + conllRow);
+            throw new MalformedConllRowException("Malformed Conll row: (" + conllRow + ")");
         }
     }
 
@@ -124,9 +131,9 @@ class ConllRow {
     public int compareEntry(ConllRow entry) {
 
         int equal;
-        int compareForma = itCollator.compare(getForma(), entry.getForma());
-        int compareLemma = itCollator.compare(getLemma(), entry.getLemma());
-        int comparePos = itCollator.compare(getPos(), entry.getPos());
+        int compareForma = getMyCollator().compare(getForma(), entry.getForma());
+        int compareLemma = getMyCollator().compare(getLemma(), entry.getLemma());
+        int comparePos = getMyCollator().compare(getPos(), entry.getPos());
 //        System.err.printf("forma: %s %s: %d\n",getForma(), entry.getForma(), compareForma);
 //        System.err.printf("lemma: %s %s: %d\n",getLemma(), entry.getLemma(), compareLemma);
 //        System.err.printf("pos: %s %s: %d\n",getPos(), entry.getPos(), comparePos);
@@ -161,7 +168,7 @@ class ConllRow {
 
         String firstTraitsAsString = this.getTraitsAsString();
         String secondTraitsAsString = entry.getTraitsAsString();
-       
+
         //VERB: lexinfo:person=lexinfo:secondPerson|lexinfo:number=lexinfo:singular|lexinfo:tense=lexinfo:past|lexinfo:mood=lexinfo:indicative
         if (this.getPos().equals(Constants.VERB)) {
             return this.compareAsVerb(entry);
@@ -244,15 +251,14 @@ class ConllRow {
     public void appendId(ConllRow entry) {
         setId(getId().concat(",").concat(entry.getId()));
     }
-    
-    public void copyMisc (ConllRow entry) {
-    
-           if(this.misc.equals(Constants.NOVALUE) && !entry.getMisc().equals(Constants.NOVALUE)){
-               this.setMisc(entry.getMisc()+"_copied");
-           }
+
+    public void copyMisc(ConllRow entry) {
+
+        if (this.misc.equals(Constants.NOVALUE) && !entry.getMisc().equals(Constants.NOVALUE)) {
+            this.setMisc(entry.getMisc());
+        }
     }
-    
-    
+
     @Override
     public String toString() {
         return String.format("%s\t%s\t%s\t%s\t_\t%s\t_\t_\t_\t%s\n",
