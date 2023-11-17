@@ -51,22 +51,22 @@ public class ConllComparator {
         ConllRow conllA = null; //Priority file to take info
         ConllRow conllB = null;
 
-        String customRules = 
-                ( "< '%' < ''' < '\"'  < '(' < ')' < '-' < '.' < 0 < 1 < 2 < 3 < 4 < 5 "
+        String customRules
+                = ("< '%' < ''' < '\"'  < '(' < ')' < '-' < '.' < 0 < 1 < 2 < 3 < 4 < 5 "
                 + "< a,A < b,B < c,C < d,D < e,E < f,F < g,G < h,H < i,I < j,J < k,K < l,L "
                 + "< m,M < n,N < o,O < p,P < q,Q < r,R < s,S < t,T < u,U < v,V < w,W < x,X < y,Y < z,Z "
-                + "< ° < µ < à,À < è,È < é,É < ì < ò < ù");
+                + "< ° < µ < à,À < è,È < é,É < ì < ò < ù < '_'");
 
 //        String customRules = (" < v < ù");
-                
         RuleBasedCollator collator = new RuleBasedCollator(customRules);
         collator.setStrength(Collator.SECONDARY);
-        
+
         //System.err.println(collator.compare("\"", "z"));
         ConllRow fakeConllRow = new ConllRow(Constants.FAKEROWSTRING, collator); //create a fake entry as last word ;
         FileWriter fileWriter = new FileWriter(outputfilename);
         PrintWriter printWriter = new PrintWriter(fileWriter);
 
+        boolean printA = true;
         while (!endA || !endB) {
             if (nextA && !endA) {
                 String firstString = firstFile.readLine();
@@ -104,11 +104,21 @@ public class ConllComparator {
                             //prendo un qualsiasi
                             if (!endA) {
                                 conllA.appendId(conllB);
-                                conllA.copyMisc(conllB);
+                                conllA.copyMisc(conllB);//??
                                 printWriter.print(conllA.toString());
                             }
-                            nextA = true;
-                            nextB = true;
+                            if (!Constants.NOVALUE.equals(conllA.getForma())) {
+                                nextA = true;
+                            }
+
+                            if (!Constants.NOVALUE.equals(conllB.getForma())) {
+                                nextB = true;
+                            }
+                            if (Constants.NOVALUE.equals(conllA.getForma())
+                                    && Constants.NOVALUE.equals(conllB.getForma())) {
+                                nextA = true;
+                                nextB = true;
+                            }
                             break;
                         case 1:
                             //A contiene B
@@ -117,22 +127,50 @@ public class ConllComparator {
                                 conllA.copyMisc(conllB);
                                 printWriter.print(conllA.toString());
                             }
-                            nextA = true;
-                            nextB = true;
+                            if (!Constants.NOVALUE.equals(conllA.getForma())) {
+                                nextA = true;
+                            } else {
+                                printA = false;
+                            }
+                            if (!Constants.NOVALUE.equals(conllB.getForma())) {
+                                nextB = true;
+                            }
+                            if (Constants.NOVALUE.equals(conllA.getForma())
+                                    && Constants.NOVALUE.equals(conllB.getForma())) {
+                                nextA = true;
+                                nextB = true;
+                            }
                             break;
                         case 2:
                             //B contiene A
                             if (!endB) {
-                                conllB.appendId(conllA);
+                                if (!Constants.NOVALUE.equals(conllA.getForma())) {
+                                    conllB.appendId(conllA);
+                                }
                                 conllB.copyMisc(conllA);
                                 printWriter.print(conllB.toString());
                             }
-                            nextA = true;
-                            nextB = true;
+                            if (!Constants.NOVALUE.equals(conllA.getForma())) {
+                                nextA = true;
+                            } else {
+                                printA = false; //caso in cui conllA non va stampata perché già incorporata in almeno una B
+                            }
+                            if (!Constants.NOVALUE.equals(conllB.getForma())) {
+                                nextB = true;
+                            }
+                            if (Constants.NOVALUE.equals(conllA.getForma())
+                                    && Constants.NOVALUE.equals(conllB.getForma())) {
+                                nextA = true;
+                                nextB = true;
+                            }
                             break;
                         case -1: //A precede B
                             if (!endA) {
-                                printWriter.print(conllA.toString());
+                                if (printA) { //sono su un _ che ha trovato un corrispondente nell'altro file e quindi ho mergiato
+                                    printWriter.print(conllA.toString());
+                                } else {
+                                    printA = true;
+                                }
                             }
                             nextA = true;
                             break;
@@ -142,7 +180,17 @@ public class ConllComparator {
                             }
                             nextB = true;
                             break;
-
+                        case -3:
+                            //caso tratti non confrontabili. li stampo entrambi e vado avanti
+                            if (!endA) {
+                                printWriter.print(conllA.toString());
+                            }
+                            nextA = true;
+                            if (!endB) {
+                                printWriter.print(conllB.toString());
+                            }
+                            nextB = true;
+                            break;
                         default: //-1 A=B != C
                             //che si fa? Si prende una tra A e B e si prende C
                             throw new AssertionError();
@@ -159,7 +207,11 @@ public class ConllComparator {
 
                 case -1: //A precede B
                     if (!endA) {
-                        printWriter.print(conllA.toString());
+                        if (printA) { //sono su un _ che ha trovato un corrispondente nell'altro file e quindi ho mergiato
+                            printWriter.print(conllA.toString());
+                        } else {
+                            printA = true;
+                        }
                     }
                     nextA = true;
                     break;

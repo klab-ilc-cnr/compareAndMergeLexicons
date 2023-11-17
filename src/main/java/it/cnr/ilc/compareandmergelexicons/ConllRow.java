@@ -5,11 +5,14 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import lombok.ToString;
 
 /**
  *
  * @author Simone Marchi
  */
+@ToString
 class ConllRow {
 
     private String id;
@@ -84,9 +87,9 @@ class ConllRow {
     private void setTraits(String traits) {
         this.traits = new LinkedHashMap<>(); //per mantenere l'ordine di inserimento
         if (traits.contains(Constants.EQUALS)) {
-            String[] ana = traits.split("\\|");
+            String[] ana = traits.split("\\|"); //divido le classi dei tratti
             for (String s : ana) {
-                String[] splitted = s.split(Constants.EQUALS);
+                String[] splitted = s.split(Constants.EQUALS); //divido chiave valore di un singolo tratto
                 this.traits.put(splitted[0], splitted[1]);
             }
         }
@@ -107,6 +110,9 @@ class ConllRow {
         if (cols.length == 10) {
             setId(cols[0]);
             setForma(cols[1]);
+            if (cols[2].contains(" ")) {
+                throw new MalformedConllRowException("Malformed Conll row: (" + conllRow + ")");
+            }
             setLemma(cols[2]);
             setPos(cols[3]);
             setTraits(cols[5]);
@@ -131,24 +137,30 @@ class ConllRow {
     public int compareEntry(ConllRow entry) {
 
         int equal;
-        int compareForma = getMyCollator().compare(getForma(), entry.getForma());
+
+        int compareForma = 0;
+
+        if (!getForma().equals(Constants.NOVALUE) || entry.getForma().equals(Constants.NOVALUE)) {
+            compareForma = getMyCollator().compare(getForma(), entry.getForma());
+        }
+
         int compareLemma = getMyCollator().compare(getLemma(), entry.getLemma());
         int comparePos = getMyCollator().compare(getPos(), entry.getPos());
 //        System.err.printf("forma: %s %s: %d\n",getForma(), entry.getForma(), compareForma);
 //        System.err.printf("lemma: %s %s: %d\n",getLemma(), entry.getLemma(), compareLemma);
 //        System.err.printf("pos: %s %s: %d\n",getPos(), entry.getPos(), comparePos);
-        if (compareForma == 0) {
-            if (compareLemma == 0) {
-                if (comparePos == 0) {
+        if (compareLemma == 0) {
+            if (comparePos == 0) {
+                if (compareForma == 0) {
                     equal = 0;
                 } else {
-                    equal = (comparePos > 0 ? 1 : -1);
+                    equal = (compareForma > 0 ? 1 : -1);
                 }
             } else {
-                equal = (compareLemma > 0 ? 1 : -1);
+                equal = (comparePos > 0 ? 1 : -1);
             }
         } else {
-            equal = (compareForma > 0 ? 1 : -1);
+            equal = (compareLemma > 0 ? 1 : -1);
         }
 
         return equal;
@@ -171,7 +183,7 @@ class ConllRow {
 
         //VERB: lexinfo:person=lexinfo:secondPerson|lexinfo:number=lexinfo:singular|lexinfo:tense=lexinfo:past|lexinfo:mood=lexinfo:indicative
         if (this.getPos().equals(Constants.VERB)) {
-            return this.compareAsVerb(entry);
+            return this.compareVerbTraits(entry);
         } else {
             if (getTraits().equals(entry.getTraits())) {
                 ret = 0;
@@ -180,18 +192,34 @@ class ConllRow {
             } else if (entry.getTraits().entrySet().containsAll(getTraits().entrySet())) {
                 ret = 2;
             } else {
-                if (firstTraitsAsString.compareTo(secondTraitsAsString) < 0) {
+                //devo stabilire chi precede basandomi sui value dei tratti in comune
+                for (Map.Entry<String, String> tr : entry.getTraits().entrySet()) {
+                    String key = tr.getKey();
+                    String value = tr.getValue();
+                    if (this.getTraits().containsKey(key)) {
+                        int compare = value.compareTo(this.getTraits().get(key));
+                        if (compare > 0) { //this precede entry
+                            return -1;
+                        } else if (compare < 0) { //entry precede this
+                            return -2;
+                        }
+                    }
+                }
+                // se arrivo qua i tratti sono inconfrontabili
+                System.err.format("Inconfrontabili %s %s\n", this.getTraits(), entry.getTraits());
+                return -3; //stampo e vado avanti su entrambi
+                /*if (firstTraitsAsString.compareTo(secondTraitsAsString) < 0) {
                     ret = -1;
                 } else {
                     ret = -2;
-                }
+                }*/
             }
         }
 
         return ret;
     }
 
-    private int compareAsVerb(ConllRow entry) {
+    private int compareVerbTraits(ConllRow entry) {
         int ret = 0;
 
         try {
@@ -220,25 +248,25 @@ class ConllRow {
                 if (getTraits().containsKey(Constants.TENSE) && entry.getTraits().containsKey(Constants.TENSE)) {
                     tense = getTraits().get(Constants.TENSE).compareTo(entry.getTraits().get(Constants.TENSE));
                 }
-            }
-            if (mood > 0) {
-                ret = -2;
-            } else if (mood < 0) {
-                ret = -1;
-            } else if (number > 0) {
-                ret = -2;
-            } else if (number < 0) {
-                ret = -1;
-            } else if (person > 0) {
-                ret = -2;
-            } else if (person < 0) {
-                ret = -1;
-            } else if (tense > 0) {
-                ret = -2;
-            } else if (tense < 0) {
-                ret = -1;
-            } else {
-                ret = 0;
+                if (mood > 0) {
+                    ret = -2;
+                } else if (mood < 0) {
+                    ret = -1;
+                } else if (number > 0) {
+                    ret = -2;
+                } else if (number < 0) {
+                    ret = -1;
+                } else if (person > 0) {
+                    ret = -2;
+                } else if (person < 0) {
+                    ret = -1;
+                } else if (tense > 0) {
+                    ret = -2;
+                } else if (tense < 0) {
+                    ret = -1;
+                } else {
+                    ret = 0;
+                }
             }
         } catch (NullPointerException e) {
             System.err.println("entry: " + entry.toString());
@@ -254,6 +282,12 @@ class ConllRow {
 
     public void copyMisc(ConllRow entry) {
 
+        if (!this.misc.equals(Constants.NOVALUE) && !entry.getMisc().equals(Constants.NOVALUE) && !this.misc.equals(entry.getMisc())) {
+            System.err.format("MISC diversi {} <>{}", this.misc, entry.getMisc());
+        }
+        if (!this.misc.equals(Constants.NOVALUE) && !entry.getMisc().equals(Constants.NOVALUE)) {
+            System.err.format("Problem copying MISC value {} <=> {}", this.misc, entry.getMisc());
+        }
         if (this.misc.equals(Constants.NOVALUE) && !entry.getMisc().equals(Constants.NOVALUE)) {
             this.setMisc(entry.getMisc());
         }

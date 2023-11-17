@@ -23,6 +23,6 @@ public class Constants {
     public static final String PERSON = "lexinfo:person";
     public static final String TENSE = "lexinfo:tense";
     public static final String VERB = "lexinfo:partOfSpeech=lexinfo:verb";
-    public static final String FAKEROWSTRING = "1\tùùù\tùùù\tùùù\t_\t_\t_\t_\t_\t_";
+    public static final String FAKEROWSTRING = "1\t___\t___\t___\t_\t_\t_\t_\t_\t_";
 
 }

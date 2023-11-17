@@ -14,7 +14,7 @@ import java.io.FileReader;
 public class CompareAndMergeLexicons {
 
     public static void main(String[] args) throws FileNotFoundException, MalformedConllRowException, Exception {
-
+        
 //        if (args.length < 2) {
 //
 //            System.err.println("No arguments!");
